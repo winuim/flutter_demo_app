@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
-import 'demo.dart';
+import 'example/firebase_storage.dart';
 
 void main() {
   // Set `enableInDevMode` to true to see reports while in debug mode
