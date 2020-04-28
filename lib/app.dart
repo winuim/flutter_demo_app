@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'cupertino_demo.dart';
 import 'demo.dart';
+import 'signin.dart';
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -42,6 +43,8 @@ class MyApp extends StatelessWidget {
           const DemoPage(title: 'Flutter Demo Home Page'),
       '/cupertino': (BuildContext context) =>
           const CupertinoDemoPage(title: 'Flutter Demo Home Page'),
+      '/signin': (BuildContext context) => SignInPage(),
     };
   }
+
 }

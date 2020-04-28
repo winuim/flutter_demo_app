@@ -19,7 +19,15 @@ class DemoPage extends StatefulWidget {
 }
 
 class _DemoPageState extends State<DemoPage> {
-  int _counter = 0;
+  int _counter;
+  bool _isSignined;
+
+  @override
+  void initState() {
+    super.initState();
+    _counter = 0;
+    _isSignined = false;
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -30,6 +38,69 @@ class _DemoPageState extends State<DemoPage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+  }
+
+  Widget _drawerHeader() {
+    if (_isSignined) {
+      return const UserAccountsDrawerHeader(
+        accountName: Text('User Name'),
+        accountEmail: Text('User Email'),
+        currentAccountPicture: CircleAvatar(
+          backgroundColor: Colors.white,
+          backgroundImage: NetworkImage('https://i.pravatar.cc/'),
+        ),
+      );
+    } else {
+      return DrawerHeader(
+        child: FlatButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/signin');
+            },
+            child: Text(
+              'サインイン',
+              style: Theme.of(context).primaryTextTheme.headline6,
+            )),
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+        ),
+      );
+    }
+  }
+
+  List<Widget> _drawerList() {
+    return <Widget>[
+      _drawerHeader(),
+      ListTile(
+        selected: true,
+        title: const Text('Cupertino Demo'),
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.of(context).pushNamed('/cupertino');
+        },
+      ),
+      ListTile(
+        selected: true,
+        title: const Text('Firebase Analytics Example'),
+        onTap: () {
+          Navigator.pop(context);
+        },
+      ),
+      ListTile(
+        selected: true,
+        title: const Text('Firebase Crashlytics Example'),
+        onTap: () {
+          Navigator.pop(context);
+        },
+      ),
+      ListTile(
+        selected: true,
+        title: const Text('Firebase Perfomance Example'),
+        onTap: () {
+          Navigator.pop(context);
+        },
+      ),
+    ];
   }
 
   @override
@@ -49,25 +120,7 @@ class _DemoPageState extends State<DemoPage> {
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text(
-                'Demo Menu',
-                style: Theme.of(context).primaryTextTheme.headline6,
-              ),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            ListTile(
-              selected: true,
-              title: const Text('Cupertino Demo'),
-              onTap: () {
-                print('onTap');
-                Navigator.of(context).pushNamed('/cupertino');
-              },
-            ),
-          ],
+          children: _drawerList(),
         ),
       ),
       body: Center(
