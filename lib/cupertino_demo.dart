@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 class CupertinoDemoPage extends StatefulWidget {
-  const CupertinoDemoPage({Key key, this.title}) : super(key: key);
+  const CupertinoDemoPage({Key key, this.title, this.analytics, this.observer})
+      : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -14,12 +17,18 @@ class CupertinoDemoPage extends StatefulWidget {
   // always marked "final".
 
   final String title;
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
 
   @override
-  _CupertinoDemoPageState createState() => _CupertinoDemoPageState();
+  _CupertinoDemoPageState createState() => _CupertinoDemoPageState(analytics, observer);
 }
 
 class _CupertinoDemoPageState extends State<CupertinoDemoPage> {
+  _CupertinoDemoPageState(this.analytics, this.observer);
+
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
   int _counter = 0;
 
   void _incrementCounter() {
@@ -30,6 +39,9 @@ class _CupertinoDemoPageState extends State<CupertinoDemoPage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+      analytics.logEvent(
+          name: 'cupertino_incrementCounter',
+          parameters: <String, dynamic>{'_counter': _counter});
     });
   }
 

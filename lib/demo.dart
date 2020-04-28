@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 class DemoPage extends StatefulWidget {
-  const DemoPage({Key key, this.title}) : super(key: key);
+  const DemoPage({Key key, this.title, this.analytics, this.observer})
+      : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -13,18 +16,24 @@ class DemoPage extends StatefulWidget {
   // always marked "final".
 
   final String title;
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
 
   @override
-  _DemoPageState createState() => _DemoPageState();
+  _DemoPageState createState() => _DemoPageState(analytics, observer);
 }
 
 class _DemoPageState extends State<DemoPage> {
+  _DemoPageState(this.analytics, this.observer);
+
+  final FirebaseAnalyticsObserver observer;
+  final FirebaseAnalytics analytics;
   int _counter;
   bool _isSignined;
 
   @override
   void initState() {
-    super.initState();
+    super.initState();    
     _counter = 0;
     _isSignined = false;
   }
@@ -37,6 +46,9 @@ class _DemoPageState extends State<DemoPage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+      analytics.logEvent(
+          name: '_incrementCounter',
+          parameters: <String, dynamic>{'_counter': _counter});
     });
   }
 

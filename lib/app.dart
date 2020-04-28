@@ -1,14 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 import 'cupertino_demo.dart';
 import 'demo.dart';
 import 'signin.dart';
+import 'signup.dart';
 
 class MyApp extends StatelessWidget {
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    analytics.logAppOpen();
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -30,8 +39,9 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       initialRoute: '/demo',
       routes: _route(),
+      navigatorObservers: <NavigatorObserver>[observer],
+      // debugShowCheckedModeBanner: false,
       // debugShowMaterialGrid: true,
-      // debugShowCheckedModeBanner: true,
       // showSemanticsDebugger: true,
       // showPerformanceOverlay: true,
     );
@@ -39,12 +49,22 @@ class MyApp extends StatelessWidget {
 
   Map<String, Widget Function(BuildContext)> _route() {
     return <String, WidgetBuilder>{
-      '/demo': (BuildContext context) =>
-          const DemoPage(title: 'Flutter Demo Home Page'),
-      '/cupertino': (BuildContext context) =>
-          const CupertinoDemoPage(title: 'Flutter Demo Home Page'),
-      '/signin': (BuildContext context) => SignInPage(),
+      '/demo': (BuildContext context) => DemoPage(
+          title: 'Flutter Demo Home Page',
+          analytics: analytics,
+          observer: observer),
+      '/cupertino': (BuildContext context) => CupertinoDemoPage(
+          title: 'Flutter Demo Home Page',
+          analytics: analytics,
+          observer: observer),
+      '/signin': (BuildContext context) => SignInPage(
+          title: 'Flutter Demo Home Page',
+          analytics: analytics,
+          observer: observer),
+      '/signup': (BuildContext context) => SignUpPage(
+          title: 'Flutter Demo Home Page',
+          analytics: analytics,
+          observer: observer),
     };
   }
-
 }
