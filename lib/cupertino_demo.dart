@@ -1,19 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return const CupertinoApp(
-      title: 'Flutter Demo',
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key, this.title}) : super(key: key);
+class CupertinoDemoPage extends StatefulWidget {
+  const CupertinoDemoPage({Key key, this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -27,10 +16,10 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _CupertinoDemoPageState createState() => _CupertinoDemoPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _CupertinoDemoPageState extends State<CupertinoDemoPage> {
   int _counter = 0;
 
   void _incrementCounter() {
