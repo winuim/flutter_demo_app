@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:the_validator/the_validator.dart';
+
+import 'authentication.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key key, this.title, this.analytics, this.observer})
@@ -17,9 +20,10 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   _SignInPageState(this.analytics, this.observer);
-
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
+
+  final BaseAuth _auth = Auth();
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -28,8 +32,8 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
+    return Scaffold(body: Builder(builder: (BuildContext context) {
+      return ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         children: <Widget>[
           const SizedBox(height: 80.0),
@@ -46,51 +50,35 @@ class _SignInPageState extends State<SignInPage> {
               key: _formKey,
               child: Column(children: <Widget>[
                 TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'メールアドレス',
-                    icon: Icon(Icons.account_circle),
-                  ),
-                  autocorrect: false,
-                  autofocus: true,
-                  validator: FieldValidator.email(message: 'メールアドレスが正しくありません'),
-                  focusNode: _emailFocus,
-                  onFieldSubmitted: (v) {
-                    FocusScope.of(context).requestFocus(_passwordFocus);
-                  }
-                ),
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'メールアドレス',
+                      icon: Icon(Icons.email),
+                    ),
+                    autocorrect: false,
+                    autofocus: true,
+                    validator:
+                        FieldValidator.email(message: 'メールアドレスが正しくありません'),
+                    focusNode: _emailFocus,
+                    onFieldSubmitted: (v) {
+                      FocusScope.of(context).requestFocus(_passwordFocus);
+                    }),
                 const SizedBox(height: 12.0),
                 TextFormField(
-                  controller: _passwordController,
-                  keyboardType: TextInputType.visiblePassword,
-                  decoration: const InputDecoration(
-                    labelText: 'パスワード',
-                    icon: Icon(Icons.security),
-                  ),
-                  obscureText: true,
-                  autocorrect: false,
-                  autofocus: false,
-                  validator: FieldValidator.password(
-                      minLength: 8,
-                      shouldContainNumber: true,
-                      shouldContainCapitalLetter: true,
-                      // shouldContainSpecialChars: true,
-                      errorMessage: 'パスワードは必要な形式と一致する必要があります',
-                      isNumberNotPresent: () {
-                        return 'パスワードには数字が必要です';
-                      },
-                      // isSpecialCharsNotPresent: () {
-                      //   return 'パスワードには特殊文字を含める必要があります';
-                      // },
-                      isCapitalLetterNotPresent: () {
-                        return 'パスワードには大文字を含める必要があります';
-                      }),
-                  focusNode: _passwordFocus,
-                  onFieldSubmitted: (v) {
-                    _passwordFocus.unfocus();
-                  }        
-                ),
+                    controller: _passwordController,
+                    keyboardType: TextInputType.visiblePassword,
+                    decoration: const InputDecoration(
+                      labelText: 'パスワード',
+                      icon: Icon(Icons.security),
+                    ),
+                    obscureText: true,
+                    autocorrect: false,
+                    autofocus: false,
+                    focusNode: _passwordFocus,
+                    onFieldSubmitted: (v) {
+                      _passwordFocus.unfocus();
+                    }),
                 ButtonBar(
                   children: <Widget>[
                     FlatButton(
@@ -103,10 +91,20 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     FlatButton(
                       child: const Text('サインイン'),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState.validate()) {
-                          analytics.logLogin();
-                          Navigator.pop(context);
+                          await _auth
+                              .signIn(_emailController.text,
+                                  _passwordController.text)
+                              .then((userId) {
+                            analytics.logLogin();
+                            Navigator.pop(context, 'サインインに成功しました');
+                          }).catchError((dynamic e) {
+                            print(e);
+                            Scaffold.of(context).showSnackBar(const SnackBar(
+                              content: Text('サインインに失敗しました'),
+                            ));
+                          });
                         }
                       },
                     ),
@@ -116,21 +114,29 @@ class _SignInPageState extends State<SignInPage> {
           FlatButton(
             child: Text('匿名サインイン',
                 style: TextStyle(color: Theme.of(context).primaryColor)),
-            onPressed: () {
-              analytics.logLogin(loginMethod: 'anonymous');
-              Navigator.pop(context);
+            onPressed: () async {
+              await _auth.signInAnonymously().then((userId) {
+                analytics.logLogin(loginMethod: 'signInAnonymously');
+                Navigator.pop(context, '匿名サインインに成功しました');
+              }).catchError((dynamic e) {
+                print(e);
+                Scaffold.of(context).showSnackBar(const SnackBar(
+                  content: Text('匿名サインインに失敗しました'),
+                ));
+              });
             },
           ),
           FlatButton(
             child: Text('アカウント登録',
                 style: TextStyle(color: Theme.of(context).primaryColor)),
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.of(context).pushNamed('/signup');
+              Navigator.of(context).pushNamed('/signup').then((result) {
+                Navigator.pop(context, result);
+              });
             },
           ),
         ],
-      ),
-    );
+      );
+    }));
   }
 }

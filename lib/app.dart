@@ -9,14 +9,14 @@ import 'signin.dart';
 import 'signup.dart';
 
 class MyApp extends StatelessWidget {
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
-  static FirebaseAnalyticsObserver observer =
-      FirebaseAnalyticsObserver(analytics: analytics);
+  static final FirebaseAnalytics _analytics = FirebaseAnalytics();
+  static final FirebaseAnalyticsObserver _observer =
+      FirebaseAnalyticsObserver(analytics: _analytics);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    analytics.logAppOpen();
+    _analytics.logAppOpen();
 
     return MaterialApp(
       title: 'Flutter Demo',
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       initialRoute: '/demo',
       routes: _route(),
-      navigatorObservers: <NavigatorObserver>[observer],
+      navigatorObservers: <NavigatorObserver>[_observer],
       // debugShowCheckedModeBanner: false,
       // debugShowMaterialGrid: true,
       // showSemanticsDebugger: true,
@@ -51,20 +51,20 @@ class MyApp extends StatelessWidget {
     return <String, WidgetBuilder>{
       '/demo': (BuildContext context) => DemoPage(
           title: 'Flutter Demo Home Page',
-          analytics: analytics,
-          observer: observer),
+          analytics: _analytics,
+          observer: _observer),
       '/cupertino': (BuildContext context) => CupertinoDemoPage(
           title: 'Flutter Demo Home Page',
-          analytics: analytics,
-          observer: observer),
+          analytics: _analytics,
+          observer: _observer),
       '/signin': (BuildContext context) => SignInPage(
           title: 'Flutter Demo Home Page',
-          analytics: analytics,
-          observer: observer),
+          analytics: _analytics,
+          observer: _observer),
       '/signup': (BuildContext context) => SignUpPage(
           title: 'Flutter Demo Home Page',
-          analytics: analytics,
-          observer: observer),
+          analytics: _analytics,
+          observer: _observer),
     };
   }
 }

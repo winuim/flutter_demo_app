@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'authentication.dart';
 
 class DemoPage extends StatefulWidget {
   const DemoPage({Key key, this.title, this.analytics, this.observer})
@@ -25,17 +30,24 @@ class DemoPage extends StatefulWidget {
 
 class _DemoPageState extends State<DemoPage> {
   _DemoPageState(this.analytics, this.observer);
-
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
-  int _counter;
-  bool _isSignined;
+
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final BaseAuth _auth = Auth();
+  FirebaseUser _user;
+  int _counter = 0;
 
   @override
   void initState() {
-    super.initState();    
+    super.initState();
     _counter = 0;
-    _isSignined = false;
+    _getCurrentUser();
+  }
+
+  Future<void> _getCurrentUser() async {
+    _user = await _auth.getCurrentUser();
+    setState(() {});
   }
 
   void _incrementCounter() {
@@ -53,11 +65,13 @@ class _DemoPageState extends State<DemoPage> {
   }
 
   Widget _drawerHeader() {
-    if (_isSignined) {
-      return const UserAccountsDrawerHeader(
-        accountName: Text('User Name'),
-        accountEmail: Text('User Email'),
-        currentAccountPicture: CircleAvatar(
+    if (_user != null) {
+      final name = _user.isAnonymous ? 'Anonymous' : _user.displayName;
+      final email = _user.isAnonymous ? '' : _user.email;
+      return UserAccountsDrawerHeader(
+        accountName: Text(name ?? 'DisplayName not set'),
+        accountEmail: Text(email ?? 'Email not set'),
+        currentAccountPicture: const CircleAvatar(
           backgroundColor: Colors.white,
           backgroundImage: NetworkImage('https://i.pravatar.cc/'),
         ),
@@ -65,9 +79,10 @@ class _DemoPageState extends State<DemoPage> {
     } else {
       return DrawerHeader(
         child: FlatButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              Navigator.of(context).pushNamed('/signin');
+              await Navigator.of(context).pushNamed('/signin');
+              await _getCurrentUser();
             },
             child: Text(
               'サインイン',
@@ -78,41 +93,6 @@ class _DemoPageState extends State<DemoPage> {
         ),
       );
     }
-  }
-
-  List<Widget> _drawerList() {
-    return <Widget>[
-      _drawerHeader(),
-      ListTile(
-        selected: true,
-        title: const Text('Cupertino Demo'),
-        onTap: () {
-          Navigator.pop(context);
-          Navigator.of(context).pushNamed('/cupertino');
-        },
-      ),
-      ListTile(
-        selected: true,
-        title: const Text('Firebase Analytics Example'),
-        onTap: () {
-          Navigator.pop(context);
-        },
-      ),
-      ListTile(
-        selected: true,
-        title: const Text('Firebase Crashlytics Example'),
-        onTap: () {
-          Navigator.pop(context);
-        },
-      ),
-      ListTile(
-        selected: true,
-        title: const Text('Firebase Perfomance Example'),
-        onTap: () {
-          Navigator.pop(context);
-        },
-      ),
-    ];
   }
 
   @override
@@ -129,12 +109,35 @@ class _DemoPageState extends State<DemoPage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: _drawerList(),
-        ),
-      ),
+      drawer: Builder(builder: (BuildContext context) {
+        return Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              _drawerHeader(),
+              ListTile(
+                title: const Text('Cupertino Demo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).pushNamed('/cupertino');
+                },
+              ),
+              ListTile(
+                title: const Text('サインアウト'),
+                onTap: () async {
+                  await _auth.signOut();
+                  await _getCurrentUser();
+                  Scaffold.of(context).showSnackBar(const SnackBar(
+                    content: Text('サインアウトしました'),
+                  ));
+                  Navigator.pop(context);
+                },
+                enabled: _user != null,
+              ),
+            ],
+          ),
+        );
+      }),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
