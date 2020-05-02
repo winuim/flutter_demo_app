@@ -63,7 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     autocorrect: false,
                     autofocus: true,
-                    validator: FieldValidator.minLength(1),
+                    validator: FieldValidator.minLength(1, message: 'ユーザ名が入力されていません'),
                     focusNode: _usernameFocus,
                     onFieldSubmitted: (v) {
                       FocusScope.of(context).requestFocus(_emailFocus);

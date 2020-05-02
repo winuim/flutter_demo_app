@@ -131,7 +131,9 @@ class _SignInPageState extends State<SignInPage> {
                 style: TextStyle(color: Theme.of(context).primaryColor)),
             onPressed: () {
               Navigator.of(context).pushNamed('/signup').then((result) {
-                Navigator.pop(context, result);
+                if (result != null) {
+                  Navigator.pop(context, result);
+                }
               });
             },
           ),

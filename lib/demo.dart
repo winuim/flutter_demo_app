@@ -1,11 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-import 'authentication.dart';
+import 'menu.dart';
 
 class DemoPage extends StatefulWidget {
   const DemoPage({Key key, this.title, this.analytics, this.observer})
@@ -33,21 +30,12 @@ class _DemoPageState extends State<DemoPage> {
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  final BaseAuth _auth = Auth();
-  FirebaseUser _user;
   int _counter = 0;
 
   @override
   void initState() {
     super.initState();
     _counter = 0;
-    _getCurrentUser();
-  }
-
-  Future<void> _getCurrentUser() async {
-    _user = await _auth.getCurrentUser();
-    setState(() {});
   }
 
   void _incrementCounter() {
@@ -64,37 +52,6 @@ class _DemoPageState extends State<DemoPage> {
     });
   }
 
-  Widget _drawerHeader() {
-    if (_user != null) {
-      final name = _user.isAnonymous ? 'Anonymous' : _user.displayName;
-      final email = _user.isAnonymous ? '' : _user.email;
-      return UserAccountsDrawerHeader(
-        accountName: Text(name ?? 'DisplayName not set'),
-        accountEmail: Text(email ?? 'Email not set'),
-        currentAccountPicture: const CircleAvatar(
-          backgroundColor: Colors.white,
-          backgroundImage: NetworkImage('https://i.pravatar.cc/'),
-        ),
-      );
-    } else {
-      return DrawerHeader(
-        child: FlatButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await Navigator.of(context).pushNamed('/signin');
-              await _getCurrentUser();
-            },
-            child: Text(
-              'サインイン',
-              style: Theme.of(context).primaryTextTheme.headline6,
-            )),
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-        ),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -109,35 +66,7 @@ class _DemoPageState extends State<DemoPage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      drawer: Builder(builder: (BuildContext context) {
-        return Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              _drawerHeader(),
-              ListTile(
-                title: const Text('Cupertino Demo'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).pushNamed('/cupertino');
-                },
-              ),
-              ListTile(
-                title: const Text('サインアウト'),
-                onTap: () async {
-                  await _auth.signOut();
-                  await _getCurrentUser();
-                  Scaffold.of(context).showSnackBar(const SnackBar(
-                    content: Text('サインアウトしました'),
-                  ));
-                  Navigator.pop(context);
-                },
-                enabled: _user != null,
-              ),
-            ],
-          ),
-        );
-      }),
+      drawer: const MenuComponent(),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
