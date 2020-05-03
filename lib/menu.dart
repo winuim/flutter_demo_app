@@ -87,6 +87,13 @@ class _MenuComponentState extends State<MenuComponent> {
             },
           ),
           ListTile(
+            title: const Text('バーコードスキャナー'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/barcode_scanner');
+            },
+          ),
+          ListTile(
             title: const Text('サインアウト'),
             onTap: () async {
               await _auth.signOut();

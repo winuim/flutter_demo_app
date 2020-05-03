@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
+import 'barcode_scanner.dart';
 import 'cupertino_demo.dart';
 import 'demo.dart';
 import 'signin.dart';
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
           title: 'Flutter Demo Home Page',
           analytics: _analytics,
           observer: _observer),
+      '/barcode_scanner': (BuildContext context) => const MaterialBarcodeScanner(),
     };
   }
 }
