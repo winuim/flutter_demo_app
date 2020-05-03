@@ -39,6 +39,7 @@ class _MaterialBarcodeScannerState extends State<MaterialBarcodeScanner>
   AnimationController _animationController;
   String _scannerHint;
   bool _closeWindow = false;
+  String _timeStamp;
   String _barcodePictureFilePath;
   Size _previewSize;
   AnimationState _currentState = AnimationState.search;
@@ -306,6 +307,7 @@ class _MaterialBarcodeScannerState extends State<MaterialBarcodeScanner>
     _cameraController = null;
 
     setState(() {
+      _timeStamp = timestamp;
       _barcodePictureFilePath = filePath;
     });
   }
@@ -338,7 +340,10 @@ class _MaterialBarcodeScannerState extends State<MaterialBarcodeScanner>
 
   Map<String, String> _barcodeValueMap(Barcode barcode) {
     final valueType = barcode.valueType;
-    final barcodeValuesMap = {'rawValue': barcode.rawValue};
+    final barcodeValuesMap = {
+      'timeStamp': _timeStamp,
+      // 'rawValue': barcode.rawValue
+    };
 
     switch (valueType) {
       case BarcodeValueType.wifi:
