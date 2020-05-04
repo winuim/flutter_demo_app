@@ -87,6 +87,13 @@ class _MenuComponentState extends State<MenuComponent> {
             },
           ),
           ListTile(
+            title: const Text('Provider Demo'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/provider_demo');
+            },
+          ),
+          ListTile(
             title: const Text('サインアウト'),
             onTap: () async {
               await _auth.signOut();

@@ -5,6 +5,7 @@ import 'package:firebase_analytics/observer.dart';
 
 import 'cupertino_demo.dart';
 import 'demo.dart';
+import 'provider_demo.dart';
 import 'signin.dart';
 import 'signup.dart';
 
@@ -55,6 +56,10 @@ class MyApp extends StatelessWidget {
           observer: _observer),
       '/cupertino': (BuildContext context) => CupertinoDemoPage(
           title: 'Flutter Demo Home Page',
+          analytics: _analytics,
+          observer: _observer),
+      '/provider_demo': (BuildContext context) => ProviderDemoPage(
+          title: 'Flutter Provider Demo Page',
           analytics: _analytics,
           observer: _observer),
       '/signin': (BuildContext context) => SignInPage(
