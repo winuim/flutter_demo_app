@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
-import '../components/menu.dart';
+import '../components/menu_drawer.dart';
 
 class DemoPage extends StatefulWidget {
   const DemoPage({Key key, this.title, this.analytics, this.observer})
@@ -66,7 +66,7 @@ class _DemoPageState extends State<DemoPage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      drawer: const MenuComponent(),
+      drawer: const MenuDrawer(),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.

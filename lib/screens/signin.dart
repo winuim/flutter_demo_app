@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:provider/provider.dart';
 
 import '../components/signup/email_textfield.dart';
 import '../components/signup/password_textfield.dart';
-import '../utils/auth_util.dart';
+import '../models/auth_user_model.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key key, this.title, this.analytics, this.observer})
@@ -23,7 +24,6 @@ class _SignInPageState extends State<SignInPage> {
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
-  final BaseAuth _auth = AuthUtil();
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -74,18 +74,20 @@ class _SignInPageState extends State<SignInPage> {
                       child: const Text('サインイン'),
                       onPressed: () async {
                         if (_formKey.currentState.validate()) {
-                          await _auth
-                              .signIn(_emailController.text,
-                                  _passwordController.text)
-                              .then((userId) {
+                          try {
+                            await Provider.of<AuthUserModel>(context,
+                                    listen: false)
+                                .signIn(_emailController.text,
+                                    _passwordController.text);
                             analytics.logLogin();
                             Navigator.pop(context, 'サインインに成功しました');
-                          }).catchError((dynamic e) {
+                          } catch (e, stackTrace) {
                             print(e);
+                            print(stackTrace);
                             Scaffold.of(context).showSnackBar(const SnackBar(
                               content: Text('サインインに失敗しました'),
                             ));
-                          });
+                          }
                         }
                       },
                     ),
@@ -96,15 +98,18 @@ class _SignInPageState extends State<SignInPage> {
             child: Text('匿名サインイン',
                 style: TextStyle(color: Theme.of(context).primaryColor)),
             onPressed: () async {
-              await _auth.signInAnonymously().then((userId) {
+              try {
+                await Provider.of<AuthUserModel>(context, listen: false)
+                    .signInAnonymously();
                 analytics.logLogin(loginMethod: 'signInAnonymously');
                 Navigator.pop(context, '匿名サインインに成功しました');
-              }).catchError((dynamic e) {
+              } catch (e, stackTrace) {
                 print(e);
+                print(stackTrace);
                 Scaffold.of(context).showSnackBar(const SnackBar(
                   content: Text('匿名サインインに失敗しました'),
                 ));
-              });
+              }
             },
           ),
           FlatButton(

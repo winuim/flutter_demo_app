@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:provider/provider.dart';
 
 import '../components/signup/email_textfield.dart';
 import '../components/signup/password_textfield.dart';
 import '../components/signup/username_textfield.dart';
-import '../utils/auth_util.dart';
+import '../models/auth_user_model.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key key, this.title, this.analytics, this.observer})
@@ -25,7 +26,6 @@ class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
-  final BaseAuth _auth = AuthUtil();
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -94,21 +94,18 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: const Text('アカウント登録'),
                       onPressed: () async {
                         if (_formKey.currentState.validate()) {
-                          await _auth
-                              .signUp(
-                                  _emailController.text,
-                                  _passwordController.text,
-                                  _usernameController.text)
-                              .then((userId) {
+                          try {
+                            await Provider.of<AuthUserModel>(context, listen: false).signUp(_emailController.text, _passwordController.text, _usernameController.text);
                             analytics.logSignUp(
                                 signUpMethod: 'createUserWithEmailAndPassword');
-                            Navigator.pop(context, 'アカウント登録に成功しました');
-                          }).catchError((dynamic e) {
+                            Navigator.pop(context, 'アカウント登録&サインインに成功しました');
+                          } catch (e, stackTrace) {
                             print(e);
+                            print(stackTrace);
                             Scaffold.of(context).showSnackBar(const SnackBar(
                               content: Text('アカウント登録に失敗しました'),
                             ));
-                          });
+                          }
                         }
                       },
                     ),
