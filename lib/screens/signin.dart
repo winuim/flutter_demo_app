@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
-import 'package:the_validator/the_validator.dart';
 
+import '../components/signup/email_textfield.dart';
+import '../components/signup/password_textfield.dart';
 import '../utils/auth_util.dart';
 
 class SignInPage extends StatefulWidget {
@@ -49,36 +49,17 @@ class _SignInPageState extends State<SignInPage> {
           Form(
               key: _formKey,
               child: Column(children: <Widget>[
-                TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'メールアドレス',
-                      icon: Icon(Icons.email),
-                    ),
-                    autocorrect: false,
-                    autofocus: true,
-                    validator:
-                        FieldValidator.email(message: 'メールアドレスが正しくありません'),
-                    focusNode: _emailFocus,
-                    onFieldSubmitted: (v) {
-                      FocusScope.of(context).requestFocus(_passwordFocus);
-                    }),
+                EmailTextField(
+                  editController: _emailController,
+                  myFocus: _emailFocus,
+                  nextFocus: _passwordFocus,
+                ),
                 const SizedBox(height: 12.0),
-                TextFormField(
-                    controller: _passwordController,
-                    keyboardType: TextInputType.visiblePassword,
-                    decoration: const InputDecoration(
-                      labelText: 'パスワード',
-                      icon: Icon(Icons.security),
-                    ),
-                    obscureText: true,
-                    autocorrect: false,
-                    autofocus: false,
-                    focusNode: _passwordFocus,
-                    onFieldSubmitted: (v) {
-                      _passwordFocus.unfocus();
-                    }),
+                PasswordTextField(
+                  editController: _passwordController,
+                  myFocus: _passwordFocus,
+                  validate: false,
+                ),
                 ButtonBar(
                   children: <Widget>[
                     FlatButton(

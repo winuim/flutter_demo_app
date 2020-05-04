@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
-import 'package:the_validator/the_validator.dart';
 
+import '../components/signup/email_textfield.dart';
+import '../components/signup/password_textfield.dart';
+import '../components/signup/username_textfield.dart';
 import '../utils/auth_util.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -54,83 +55,29 @@ class _SignUpPageState extends State<SignUpPage> {
           Form(
               key: _formKey,
               child: Column(children: <Widget>[
-                TextFormField(
-                    controller: _usernameController,
-                    keyboardType: TextInputType.text,
-                    decoration: const InputDecoration(
-                      labelText: 'ユーザ名',
-                      icon: Icon(Icons.account_circle),
-                    ),
-                    autocorrect: false,
-                    autofocus: true,
-                    validator: FieldValidator.minLength(1, message: 'ユーザ名が入力されていません'),
-                    focusNode: _usernameFocus,
-                    onFieldSubmitted: (v) {
-                      FocusScope.of(context).requestFocus(_emailFocus);
-                    }),
+                UsernameTextField(
+                  editController: _usernameController,
+                  myFocus: _usernameFocus,
+                  nextFocus: _emailFocus,
+                ),
                 const SizedBox(height: 12.0),
-                TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'メールアドレス',
-                      icon: Icon(Icons.email),
-                    ),
-                    autocorrect: false,
-                    autofocus: false,
-                    validator:
-                        FieldValidator.email(message: 'メールアドレスが正しくありません'),
-                    focusNode: _emailFocus,
-                    onFieldSubmitted: (v) {
-                      FocusScope.of(context).requestFocus(_passwordFocus);
-                    }),
+                EmailTextField(
+                  editController: _emailController,
+                  myFocus: _emailFocus,
+                  nextFocus: _passwordFocus,
+                ),
                 const SizedBox(height: 12.0),
-                TextFormField(
-                    controller: _passwordController,
-                    keyboardType: TextInputType.visiblePassword,
-                    decoration: const InputDecoration(
-                      labelText: 'パスワード',
-                      icon: Icon(Icons.security),
-                    ),
-                    obscureText: true,
-                    autocorrect: false,
-                    autofocus: false,
-                    validator: FieldValidator.password(
-                        minLength: 8,
-                        shouldContainNumber: true,
-                        shouldContainCapitalLetter: true,
-                        // shouldContainSpecialChars: true,
-                        errorMessage: 'パスワードは必要な形式と一致する必要があります',
-                        isNumberNotPresent: () {
-                          return 'パスワードには数字が必要です';
-                        },
-                        // isSpecialCharsNotPresent: () {
-                        //   return 'パスワードには特殊文字を含める必要があります';
-                        // },
-                        isCapitalLetterNotPresent: () {
-                          return 'パスワードには大文字を含める必要があります';
-                        }),
-                    focusNode: _passwordFocus,
-                    onFieldSubmitted: (v) {
-                      FocusScope.of(context).requestFocus(_confirmFocus);
-                    }),
+                PasswordTextField(
+                  editController: _passwordController,
+                  myFocus: _passwordFocus,
+                  nextFocus: _confirmFocus,
+                ),
                 const SizedBox(height: 12.0),
-                TextFormField(
-                    controller: _confirmController,
-                    keyboardType: TextInputType.visiblePassword,
-                    decoration: const InputDecoration(
-                      labelText: '確認用パスワード',
-                      icon: Icon(Icons.security),
-                    ),
-                    obscureText: true,
-                    autocorrect: false,
-                    autofocus: false,
-                    validator: FieldValidator.equalTo(_passwordController.text,
-                        message: 'パスワードが一致していません'),
-                    focusNode: _confirmFocus,
-                    onFieldSubmitted: (v) {
-                      _confirmFocus.unfocus();
-                    }),
+                ConfirmPasswordTextField(
+                  editController: _confirmController,
+                  passwordController: _passwordController,
+                  myFocus: _confirmFocus,
+                ),
                 ButtonBar(
                   children: <Widget>[
                     FlatButton(
