@@ -4,7 +4,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:the_validator/the_validator.dart';
 
-import 'authentication.dart';
+import '../utils/auth_util.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key key, this.title, this.analytics, this.observer})
@@ -23,7 +23,7 @@ class _SignInPageState extends State<SignInPage> {
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
-  final BaseAuth _auth = Auth();
+  final BaseAuth _auth = AuthUtil();
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();

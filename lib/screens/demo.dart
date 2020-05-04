@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
-import 'menu.dart';
+import '../components/menu.dart';
 
 class DemoPage extends StatefulWidget {
   const DemoPage({Key key, this.title, this.analytics, this.observer})

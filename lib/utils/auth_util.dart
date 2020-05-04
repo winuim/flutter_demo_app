@@ -18,7 +18,7 @@ abstract class BaseAuth {
   Future<bool> isEmailVerified();
 }
 
-class Auth implements BaseAuth {
+class AuthUtil implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   @override

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
-import 'cupertino_demo.dart';
-import 'demo.dart';
-import 'provider_demo.dart';
-import 'signin.dart';
-import 'signup.dart';
+import 'screens/cupertino_demo.dart';
+import 'screens/demo.dart';
+import 'screens/provider_demo.dart';
+import 'screens/signin.dart';
+import 'screens/signup.dart';
 
 class MyApp extends StatelessWidget {
   static final FirebaseAnalytics _analytics = FirebaseAnalytics();

@@ -3,7 +3,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'authentication.dart';
+import '../utils/auth_util.dart';
 
 class MenuComponent extends StatefulWidget {
   const MenuComponent({Key key, this.analytics, this.observer})
@@ -21,7 +21,7 @@ class _MenuComponentState extends State<MenuComponent> {
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
-  final BaseAuth _auth = Auth();
+  final BaseAuth _auth = AuthUtil();
   FirebaseUser _user;
 
   @override
