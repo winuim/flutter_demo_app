@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:provider/provider.dart';
@@ -81,6 +82,11 @@ class _SignInPageState extends State<SignInPage> {
                                     _passwordController.text);
                             analytics.logLogin();
                             Navigator.pop(context, 'サインインに成功しました');
+                          } on PlatformException catch (e) {
+                            print(e);
+                            Scaffold.of(context).showSnackBar(const SnackBar(
+                              content: Text('サインインに失敗しました'),
+                            ));
                           } catch (e, stackTrace) {
                             print(e);
                             print(stackTrace);
@@ -95,21 +101,10 @@ class _SignInPageState extends State<SignInPage> {
                 ),
               ])),
           FlatButton(
-            child: Text('匿名サインイン',
+            child: Text('お困りの時はこちら',
                 style: TextStyle(color: Theme.of(context).primaryColor)),
-            onPressed: () async {
-              try {
-                await Provider.of<AuthUserModel>(context, listen: false)
-                    .signInAnonymously();
-                analytics.logLogin(loginMethod: 'signInAnonymously');
-                Navigator.pop(context, '匿名サインインに成功しました');
-              } catch (e, stackTrace) {
-                print(e);
-                print(stackTrace);
-                Scaffold.of(context).showSnackBar(const SnackBar(
-                  content: Text('匿名サインインに失敗しました'),
-                ));
-              }
+            onPressed: () {
+              Navigator.of(context).pushNamed('/password_reset');
             },
           ),
           FlatButton(
@@ -121,6 +116,29 @@ class _SignInPageState extends State<SignInPage> {
                   Navigator.pop(context, result);
                 }
               });
+            },
+          ),
+          FlatButton(
+            child: Text('匿名サインイン',
+                style: TextStyle(color: Theme.of(context).primaryColor)),
+            onPressed: () async {
+              try {
+                await Provider.of<AuthUserModel>(context, listen: false)
+                    .signInAnonymously();
+                analytics.logLogin(loginMethod: 'signInAnonymously');
+                Navigator.pop(context, '匿名サインインに成功しました');
+              } on PlatformException catch (e) {
+                // print(e);
+                Scaffold.of(context).showSnackBar(const SnackBar(
+                  content: Text('匿名サインインに失敗しました'),
+                ));
+              } catch (e, stackTrace) {
+                print(e);
+                print(stackTrace);
+                Scaffold.of(context).showSnackBar(const SnackBar(
+                  content: Text('匿名サインインに失敗しました'),
+                ));
+              }
             },
           ),
         ],

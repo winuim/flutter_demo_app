@@ -42,7 +42,7 @@ class MenuDrawer extends StatelessWidget {
               ));
               Navigator.pop(context);
             },
-            enabled: Provider.of<AuthUserModel>(context, listen: false).user != null,
+            enabled: Provider.of<AuthUserModel>(context).user != null,
           ),
         ],
       ),
@@ -55,7 +55,7 @@ class _MenuDrawHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<AuthUserModel>(context, listen: false).user;
+    final user = Provider.of<AuthUserModel>(context).user;
     if (user == null) {
       return DrawerHeader(
         child: FlatButton(

@@ -7,6 +7,7 @@ import 'package:firebase_analytics/observer.dart';
 import 'models/auth_user_model.dart';
 import 'screens/cupertino_demo.dart';
 import 'screens/demo.dart';
+import 'screens/password_reset.dart';
 import 'screens/provider_demo.dart';
 import 'screens/signin.dart';
 import 'screens/signup.dart';
@@ -65,7 +66,7 @@ class MyApp extends StatelessWidget {
           analytics: _analytics,
           observer: _observer),
       '/cupertino': (BuildContext context) => CupertinoDemoPage(
-          title: 'Flutter Demo Home Page',
+          title: 'Flutter Cupertino Demo Page',
           analytics: _analytics,
           observer: _observer),
       '/provider_demo': (BuildContext context) => ProviderDemoPage(
@@ -73,11 +74,15 @@ class MyApp extends StatelessWidget {
           analytics: _analytics,
           observer: _observer),
       '/signin': (BuildContext context) => SignInPage(
-          title: 'Flutter Demo Home Page',
+          title: 'Flutter SignIn Page',
           analytics: _analytics,
           observer: _observer),
       '/signup': (BuildContext context) => SignUpPage(
-          title: 'Flutter Demo Home Page',
+          title: 'Flutter SignUp Page',
+          analytics: _analytics,
+          observer: _observer),
+      '/password_reset': (BuildContext context) => PasswordResetPage(
+          title: 'Flutter Password Reset Page',
           analytics: _analytics,
           observer: _observer),
     };

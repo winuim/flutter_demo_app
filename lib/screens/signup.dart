@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:provider/provider.dart';
@@ -95,10 +96,31 @@ class _SignUpPageState extends State<SignUpPage> {
                       onPressed: () async {
                         if (_formKey.currentState.validate()) {
                           try {
-                            await Provider.of<AuthUserModel>(context, listen: false).signUp(_emailController.text, _passwordController.text, _usernameController.text);
+                            await Provider.of<AuthUserModel>(context,
+                                    listen: false)
+                                .signUp(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                    _usernameController.text);
                             analytics.logSignUp(
                                 signUpMethod: 'createUserWithEmailAndPassword');
                             Navigator.pop(context, 'アカウント登録&サインインに成功しました');
+                          } on PlatformException catch (e) {
+                            // print(e);
+                            switch (e.code) {
+                              case 'ERROR_EMAIL_ALREADY_IN_USE':
+                                Scaffold.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text('登録済みのメールアドレスです'),
+                                ));
+                                break;
+                              default:
+                                Scaffold.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text('アカウント登録に失敗しました'),
+                                ));
+                                break;
+                            }
                           } catch (e, stackTrace) {
                             print(e);
                             print(stackTrace);

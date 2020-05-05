@@ -73,8 +73,9 @@ class AuthUserModel with ChangeNotifier {
     final userUpdateInfo = UserUpdateInfo();
     userUpdateInfo.displayName = username;
     await user.updateProfile(userUpdateInfo);
-    assert(user.displayName == username);
-    _user = user;
+    final currentUser = await _firebaseAuth.currentUser();
+    assert(currentUser.displayName == username);
+    _user = currentUser;
     notifyListeners();
   }
 }

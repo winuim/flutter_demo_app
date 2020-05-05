@@ -27,8 +27,9 @@ class PasswordTextField extends StatelessWidget {
         obscureText: true,
         autocorrect: false,
         autofocus: false,
-        validator: (validate == null || validate)
-            ? FieldValidator.password(
+        validator: (value) {
+          if (validate == null || validate) {
+            return FieldValidator.password(
                 minLength: 8,
                 shouldContainNumber: true,
                 shouldContainCapitalLetter: true,
@@ -42,8 +43,11 @@ class PasswordTextField extends StatelessWidget {
                 // },
                 isCapitalLetterNotPresent: () {
                   return 'パスワードには大文字を含める必要があります';
-                })
-            : null,
+                })(value);
+          } else {
+            return null;
+          }
+        },
         focusNode: myFocus,
         onFieldSubmitted: (v) {
           if (nextFocus == null) {
@@ -81,8 +85,10 @@ class ConfirmPasswordTextField extends StatelessWidget {
         obscureText: true,
         autocorrect: false,
         autofocus: false,
-        validator: FieldValidator.equalTo(passwordController.text,
-            message: 'パスワードが一致していません'),
+        validator: (value) {
+          return FieldValidator.equalTo(passwordController.text,
+            message: 'パスワードが一致していません')(value);
+        },
         focusNode: myFocus,
         onFieldSubmitted: (v) {
           if (nextFocus == null) {
