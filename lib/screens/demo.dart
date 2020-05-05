@@ -6,12 +6,12 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 
 import '../components/menu_drawer.dart';
 import '../models/auth_user_model.dart';
 import '../models/counter_model.dart';
 import '../utils/counter_storage.dart';
+import '../utils/sharedpref_device_uuid.dart';
 
 final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
@@ -44,8 +44,8 @@ class _DemoPageState extends State<DemoPage> {
   final FirebaseAnalytics analytics;
 
   final CounterProvider _counterProvider = CounterProvider();
+  final SharedprefDeviceUUID _spDeviceUUID = SharedprefDeviceUUID();
   int _counter;
-  String _uuid;
   CounterModel _model;
 
   @override
@@ -57,7 +57,6 @@ class _DemoPageState extends State<DemoPage> {
         _counter = value;
       });
     });
-    _uuid = Uuid().v4();
     _counterProvider.open();
   }
 
@@ -94,13 +93,14 @@ class _DemoPageState extends State<DemoPage> {
 
   Future<void> _updateDB(int counter) async {
     if (_model == null) {
-      await _counterProvider.getUidModel(_uuid).then((model) {
+      final uuid = await _spDeviceUUID.read();
+      await _counterProvider.getCounterModel(uuid).then((model) {
         _model = model;
       });
     }
     _model.counter = counter;
     await _counterProvider.update(_model);
-    // print('id: ${_model.id}, uid: ${_model.uid}, counter: ${_model.counter}');
+    // print('id: ${_model.id}, uuid: ${_model.uuid}, counter: ${_model.counter}');
     setState(() {});
   }
 

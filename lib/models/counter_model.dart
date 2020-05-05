@@ -6,18 +6,24 @@ import 'package:sqflite/sqflite.dart';
 const String dbName = 'demo.db';
 const String tableName = 'demo';
 const String columnId = '_id';
-const String columnUid = 'uid';
+const String columnUuid = 'uuid';
 const String columnCounter = 'counter';
+const String tableCreateQuery = '''
+create table $tableName ( 
+  $columnId integer primary key autoincrement, 
+  $columnUuid text not null,
+  $columnCounter integer not null)
+''';
 
 class CounterModel {
-  CounterModel({this.id, this.uid, this.counter});
+  CounterModel({this.id, this.uuid, this.counter});
 
   int id;
-  String uid;
+  String uuid;
   int counter;
 
   Map<String, dynamic> toMap() {
-    final map = <String, dynamic>{columnUid: uid, columnCounter: counter};
+    final map = <String, dynamic>{columnUuid: uuid, columnCounter: counter};
     if (id != null) {
       map[columnId] = id;
     }
@@ -26,30 +32,57 @@ class CounterModel {
 
   CounterModel.fromMap(Map<String, dynamic> map) {
     id = map[columnId] as int;
-    uid = map[columnUid] as String;
+    uuid = map[columnUuid] as String;
     counter = map[columnCounter] as int;
   }
 }
 
 class CounterProvider {
   Database _db;
-  Database get db => _db;
 
-  Future<void> open() async {
-    _db = await openDatabase(
-      // Set the path to the database.
-      join(await getDatabasesPath(), dbName),
-      // When the database is first created, create a table to store tableName.
-      onCreate: (Database db, int version) async {
-        await db.execute('''
-create table $tableName ( 
-  $columnId integer primary key autoincrement, 
-  $columnUid text not null,
-  $columnCounter integer not null)
-''');
-      },
-      version: 1,
-    );
+  Future open() async {
+    // Set the path to the database.
+    final dbPath = join(await getDatabasesPath(), dbName);
+    _db = await openDatabase(dbPath, version: 1,
+        // When the database is first created, create a table to store tableName.
+        onCreate: (Database db, int version) async {
+      await db.execute(tableCreateQuery);
+    });
+  }
+
+  Future<void> close() async => _db.close();
+
+  Future<void> createTable() async => _db.execute(tableCreateQuery);
+
+  Future<void> dropTable() async =>
+      _db.execute('DROP TABLE IF EXISTS $tableName');
+
+  Future<void> clearTable() async => _db.execute('DELETE FROM $tableName');
+
+  Future<CounterModel> create(CounterModel model) async {
+    model.id = await _db.insert(tableName, model.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+    return model;
+  }
+
+  Future<CounterModel> read(int id) async {
+    List<Map<String, dynamic>> maps = await _db.query(tableName,
+        columns: [columnId, columnUuid, columnCounter],
+        where: '$columnId = ?',
+        whereArgs: [id]);
+    if (maps.isNotEmpty) {
+      return CounterModel.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  Future<int> update(CounterModel model) async {
+    return _db.update(tableName, model.toMap(),
+        where: '$columnId = ?', whereArgs: [model.id]);
+  }
+
+  Future<int> delete(int id) async {
+    return _db.delete(tableName, where: '$columnId = ?', whereArgs: [id]);
   }
 
   Future<List<CounterModel>> all() async {
@@ -60,50 +93,29 @@ create table $tableName (
     return List.generate(maps.length, (i) {
       return CounterModel(
         id: maps[i][columnId] as int,
-        uid: maps[i][columnUid] as String,
+        uuid: maps[i][columnUuid] as String,
         counter: maps[i][columnCounter] as int,
       );
     });
   }
 
-  Future<CounterModel> getModel(int id) async {
-    List<Map<String, dynamic>> maps = await _db.query(tableName,
-        columns: [columnId, columnUid, columnCounter],
-        where: '$columnId = ?',
-        whereArgs: [id]);
-    if (maps.isNotEmpty) {
-      return CounterModel.fromMap(maps.first);
+  Future<CounterModel> getCounterModel(String uuid) async {
+    CounterModel result;
+    try {
+      List<Map<String, dynamic>> maps = await _db.query(tableName,
+          columns: [columnId, columnUuid, columnCounter],
+          where: '$columnUuid = ?',
+          whereArgs: [uuid]);
+      if (maps.isNotEmpty) {
+        result = CounterModel.fromMap(maps.first);
+      } else {
+        final initModel = CounterModel(uuid: uuid, counter: 0);
+        result = await create(initModel);
+      }
+    } catch (e, statckTrace) {
+      print(e);
+      print(statckTrace);
     }
-    return null;
-  }
-
-  Future<CounterModel> insert(CounterModel model) async {
-    model.id = await _db.insert(tableName, model.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
-    return model;
-  }
-
-  Future<int> delete(int id) async {
-    return _db.delete(tableName, where: '$columnId = ?', whereArgs: [id]);
-  }
-
-  Future<int> update(CounterModel model) async {
-    return _db.update(tableName, model.toMap(),
-        where: '$columnId = ?', whereArgs: [model.id]);
-  }
-
-  Future<void> close() async => _db.close();
-
-  Future<CounterModel> getUidModel(String uid) async {
-    List<Map<String, dynamic>> maps = await _db.query(tableName,
-        columns: [columnId, columnUid, columnCounter],
-        where: '$columnUid = ?',
-        whereArgs: [uid]);
-    if (maps.isNotEmpty) {
-      return CounterModel.fromMap(maps.first);
-    } else {
-      final model = CounterModel(uid: uid, counter: 0);
-      return insert(model);
-    }
+    return result;
   }
 }
