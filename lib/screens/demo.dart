@@ -1,11 +1,20 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:provider/provider.dart';
 
 import '../components/menu_drawer.dart';
+import '../models/auth_user_model.dart';
+import '../utils/counter_storage.dart';
+
+final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
 class DemoPage extends StatefulWidget {
-  const DemoPage({Key key, this.title, this.analytics, this.observer})
+  const DemoPage({Key key, this.title, this.analytics, this.observer, this.storage})
       : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
@@ -20,6 +29,7 @@ class DemoPage extends StatefulWidget {
   final String title;
   final FirebaseAnalytics analytics;
   final FirebaseAnalyticsObserver observer;
+  final CounterStorage storage;
 
   @override
   _DemoPageState createState() => _DemoPageState(analytics, observer);
@@ -31,14 +41,20 @@ class _DemoPageState extends State<DemoPage> {
   final FirebaseAnalytics analytics;
 
   int _counter = 0;
+  final List<StorageUploadTask> _tasks = <StorageUploadTask>[];
 
   @override
   void initState() {
     super.initState();
-    _counter = 0;
+    // _counter = 0;
+    widget.storage.readCounter().then((int value) {
+      setState(() {
+        _counter = value;
+      });
+    });
   }
 
-  void _incrementCounter() {
+  Future<File> _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -46,10 +62,23 @@ class _DemoPageState extends State<DemoPage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-      analytics.logEvent(
-          name: '_incrementCounter',
-          parameters: <String, dynamic>{'_counter': _counter});
     });
+    analytics.logEvent(
+        name: '_incrementCounter',
+        parameters: <String, dynamic>{'_counter': _counter});
+    // Write the variable as a string to the file.
+    return widget.storage.writeCounter(_counter);
+  }
+
+  Future<File> _resetCounter() {
+    setState(() {
+      _counter = 0;
+    });
+    analytics.logEvent(
+        name: '_resetCounter',
+        parameters: <String, dynamic>{'_counter': _counter});
+    // Write the variable as a string to the file.
+    return widget.storage.writeCounter(_counter);
   }
 
   @override
@@ -94,6 +123,31 @@ class _DemoPageState extends State<DemoPage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            Container(
+              child: Builder(builder: (BuildContext context) {
+                return RaisedButton(
+                  child: const Text('Reset'),
+                  onPressed: _resetCounter,
+                );
+              }),
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.center,
+            ),
+            Container(
+              child: Builder(builder: (BuildContext context) {
+                return RaisedButton(
+                  child: const Text('Upload File'),
+                  onPressed: () async {
+                    final result = await _uploadFile();
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(result),
+                    ));
+                  },
+                );
+              }),
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.center,
+            )
           ],
         ),
       ),
@@ -103,5 +157,51 @@ class _DemoPageState extends State<DemoPage> {
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<String> _uploadFile() async {
+    final user = Provider.of<AuthUserModel>(context, listen: false).user;
+    if (user == null) {
+      return 'No one has signed in.';
+    }
+
+    final File file = await widget.storage.file;
+
+    final StorageReference storageReference = _firebaseStorage
+        .ref()
+        .child('text')
+        .child(user.uid)
+        .child('counter.txt');
+
+    final StorageUploadTask uploadTask = storageReference.putFile(
+      file,
+      StorageMetadata(
+        contentLanguage: 'en',
+        customMetadata: <String, String>{'activity': 'test'},
+      ),
+    );
+
+    final StreamSubscription<StorageTaskEvent> streamSubscription =
+        uploadTask.events.listen((event) {
+      // You can use this to notify yourself or your user in any kind of way.
+      // For example: you could use the uploadTask.events stream in a StreamBuilder instead
+      // to show your user what the current status is. In that case, you would not need to cancel any
+      // subscription as StreamBuilder handles this automatically.
+
+      // Here, every StorageTaskEvent concerning the upload is printed to the logs.
+      print('EVENT ${event.type}');
+    });
+
+    // Cancel your subscription when done.
+    await uploadTask.onComplete;
+    streamSubscription.cancel();
+
+    final downloadUrl = (await storageReference.getDownloadURL()).toString();
+    print('downloadUrl: $downloadUrl');
+
+    setState(() {
+      _tasks.add(uploadTask);
+    });
+    return downloadUrl.toString();
   }
 }

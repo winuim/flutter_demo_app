@@ -11,6 +11,7 @@ import 'screens/password_reset.dart';
 import 'screens/provider_demo.dart';
 import 'screens/signin.dart';
 import 'screens/signup.dart';
+import 'utils/counter_storage.dart';
 
 class MyApp extends StatelessWidget {
   static final FirebaseAnalytics _analytics = FirebaseAnalytics();
@@ -64,7 +65,8 @@ class MyApp extends StatelessWidget {
       '/demo': (BuildContext context) => DemoPage(
           title: 'Flutter Demo Home Page',
           analytics: _analytics,
-          observer: _observer),
+          observer: _observer,
+          storage: CounterStorage()),
       '/cupertino': (BuildContext context) => CupertinoDemoPage(
           title: 'Flutter Cupertino Demo Page',
           analytics: _analytics,
