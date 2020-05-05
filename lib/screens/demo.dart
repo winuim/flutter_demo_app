@@ -6,15 +6,18 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 import '../components/menu_drawer.dart';
 import '../models/auth_user_model.dart';
+import '../models/counter_model.dart';
 import '../utils/counter_storage.dart';
 
 final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
 class DemoPage extends StatefulWidget {
-  const DemoPage({Key key, this.title, this.analytics, this.observer, this.storage})
+  const DemoPage(
+      {Key key, this.title, this.analytics, this.observer, this.storage})
       : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
@@ -40,8 +43,10 @@ class _DemoPageState extends State<DemoPage> {
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
-  int _counter = 0;
-  final List<StorageUploadTask> _tasks = <StorageUploadTask>[];
+  final CounterProvider _counterProvider = CounterProvider();
+  int _counter;
+  String _uuid;
+  CounterModel _model;
 
   @override
   void initState() {
@@ -52,9 +57,11 @@ class _DemoPageState extends State<DemoPage> {
         _counter = value;
       });
     });
+    _uuid = Uuid().v4();
+    _counterProvider.open();
   }
 
-  Future<File> _incrementCounter() {
+  Future<void> _incrementCounter() async {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -63,22 +70,38 @@ class _DemoPageState extends State<DemoPage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
-    analytics.logEvent(
+    await analytics.logEvent(
         name: '_incrementCounter',
         parameters: <String, dynamic>{'_counter': _counter});
     // Write the variable as a string to the file.
-    return widget.storage.writeCounter(_counter);
+    await widget.storage.writeCounter(_counter);
+
+    await _updateDB(_counter);
   }
 
-  Future<File> _resetCounter() {
+  Future<void> _resetCounter() async {
     setState(() {
       _counter = 0;
     });
-    analytics.logEvent(
+    await analytics.logEvent(
         name: '_resetCounter',
         parameters: <String, dynamic>{'_counter': _counter});
     // Write the variable as a string to the file.
-    return widget.storage.writeCounter(_counter);
+    await widget.storage.writeCounter(_counter);
+
+    await _updateDB(_counter);
+  }
+
+  Future<void> _updateDB(int counter) async {
+    if (_model == null) {
+      await _counterProvider.getUidModel(_uuid).then((model) {
+        _model = model;
+      });
+    }
+    _model.counter = counter;
+    await _counterProvider.update(_model);
+    // print('id: ${_model.id}, uid: ${_model.uid}, counter: ${_model.counter}');
+    setState(() {});
   }
 
   @override
@@ -198,10 +221,6 @@ class _DemoPageState extends State<DemoPage> {
 
     final downloadUrl = (await storageReference.getDownloadURL()).toString();
     print('downloadUrl: $downloadUrl');
-
-    setState(() {
-      _tasks.add(uploadTask);
-    });
     return downloadUrl.toString();
   }
 }
