@@ -7,15 +7,14 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
 
-import '../components/menu_drawer.dart';
-import '../models/auth_user_model.dart';
-import '../utils/counter_store.dart';
+import 'package:flutter_demo_app/components/menu_drawer.dart';
+import 'package:flutter_demo_app/models/auth_user_model.dart';
+import 'package:flutter_demo_app/utils/counter_store.dart';
 
 final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
 class DemoPage extends StatefulWidget {
-  const DemoPage(
-      {Key key, this.title, this.analytics, this.observer})
+  const DemoPage({Key key, this.title, this.analytics, this.observer})
       : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
@@ -32,20 +31,16 @@ class DemoPage extends StatefulWidget {
   final FirebaseAnalyticsObserver observer;
 
   @override
-  _DemoPageState createState() => _DemoPageState(analytics, observer);
+  _DemoPageState createState() => _DemoPageState();
 }
 
 class _DemoPageState extends State<DemoPage> {
-  _DemoPageState(this.analytics, this.observer);
-  final FirebaseAnalyticsObserver observer;
-  final FirebaseAnalytics analytics;
-
   int _counter;
 
   @override
   void initState() {
     super.initState();
-    // _counter = 0;
+    _counter = 0;
     CounterStore().get().then((value) {
       setState(() {
         _counter = value;
@@ -62,7 +57,7 @@ class _DemoPageState extends State<DemoPage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
-    analytics.logEvent(
+    widget.analytics.logEvent(
         name: '_incrementCounter',
         parameters: <String, dynamic>{'_counter': _counter});
     CounterStore().set(_counter);
@@ -72,7 +67,7 @@ class _DemoPageState extends State<DemoPage> {
     setState(() {
       _counter = 0;
     });
-    analytics.logEvent(
+    widget.analytics.logEvent(
         name: '_resetCounter',
         parameters: <String, dynamic>{'_counter': _counter});
     CounterStore().set(_counter);
@@ -118,11 +113,16 @@ class _DemoPageState extends State<DemoPage> {
             ),
             Text(
               '$_counter',
+              // Provide a Key to this specific Text widget. This allows
+              // identifing the widget from inside the test suite,
+              // and reading the text.
+              key: const Key('counter'),
               style: Theme.of(context).textTheme.headline4,
             ),
             Container(
               child: Builder(builder: (BuildContext context) {
                 return RaisedButton(
+                  key: const Key('reset'),
                   child: const Text('Reset'),
                   onPressed: _resetCounter,
                 );
@@ -133,6 +133,7 @@ class _DemoPageState extends State<DemoPage> {
             Container(
               child: Builder(builder: (BuildContext context) {
                 return RaisedButton(
+                  key: const Key('upload'),
                   child: const Text('Upload File'),
                   onPressed: () async {
                     final result = await _uploadFile();
@@ -149,6 +150,9 @@ class _DemoPageState extends State<DemoPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        // Provide a Key to this button. This allows finding this
+        // specific button inside the test suite, and tapping it.
+        key: const Key('increment'),
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: Icon(Icons.add),
