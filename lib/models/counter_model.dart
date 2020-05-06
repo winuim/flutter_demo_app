@@ -100,22 +100,15 @@ class CounterProvider {
   }
 
   Future<CounterModel> getCounterModel(String uuid) async {
-    CounterModel result;
-    try {
-      List<Map<String, dynamic>> maps = await _db.query(tableName,
-          columns: [columnId, columnUuid, columnCounter],
-          where: '$columnUuid = ?',
-          whereArgs: [uuid]);
-      if (maps.isNotEmpty) {
-        result = CounterModel.fromMap(maps.first);
-      } else {
-        final initModel = CounterModel(uuid: uuid, counter: 0);
-        result = await create(initModel);
-      }
-    } catch (e, statckTrace) {
-      print(e);
-      print(statckTrace);
+    List<Map<String, dynamic>> maps = await _db.query(tableName,
+        columns: [columnId, columnUuid, columnCounter],
+        where: '$columnUuid = ?',
+        whereArgs: [uuid]);
+    if (maps.isNotEmpty) {
+      return CounterModel.fromMap(maps.first);
+    } else {
+      final initModel = CounterModel(uuid: uuid, counter: 0);
+      return create(initModel);
     }
-    return result;
   }
 }

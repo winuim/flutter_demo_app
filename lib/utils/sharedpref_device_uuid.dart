@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class SharedprefDeviceUUID {
+  SharedprefDeviceUUID();
   static const deviceUuidSaveKey = 'device-uuid';
 
   Future<void> save(String uuid) async {

@@ -9,15 +9,13 @@ import 'package:provider/provider.dart';
 
 import '../components/menu_drawer.dart';
 import '../models/auth_user_model.dart';
-import '../models/counter_model.dart';
-import '../utils/counter_storage.dart';
-import '../utils/sharedpref_device_uuid.dart';
+import '../utils/counter_store.dart';
 
 final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
 class DemoPage extends StatefulWidget {
   const DemoPage(
-      {Key key, this.title, this.analytics, this.observer, this.storage})
+      {Key key, this.title, this.analytics, this.observer})
       : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
@@ -32,7 +30,6 @@ class DemoPage extends StatefulWidget {
   final String title;
   final FirebaseAnalytics analytics;
   final FirebaseAnalyticsObserver observer;
-  final CounterStorage storage;
 
   @override
   _DemoPageState createState() => _DemoPageState(analytics, observer);
@@ -43,24 +40,20 @@ class _DemoPageState extends State<DemoPage> {
   final FirebaseAnalyticsObserver observer;
   final FirebaseAnalytics analytics;
 
-  final CounterProvider _counterProvider = CounterProvider();
-  final SharedprefDeviceUUID _spDeviceUUID = SharedprefDeviceUUID();
   int _counter;
-  CounterModel _model;
 
   @override
   void initState() {
     super.initState();
     // _counter = 0;
-    widget.storage.readCounter().then((int value) {
+    CounterStore().get().then((value) {
       setState(() {
         _counter = value;
       });
     });
-    _counterProvider.open();
   }
 
-  Future<void> _incrementCounter() async {
+  void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -69,39 +62,20 @@ class _DemoPageState extends State<DemoPage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
-    await analytics.logEvent(
+    analytics.logEvent(
         name: '_incrementCounter',
         parameters: <String, dynamic>{'_counter': _counter});
-    // Write the variable as a string to the file.
-    await widget.storage.writeCounter(_counter);
-
-    await _updateDB(_counter);
+    CounterStore().set(_counter);
   }
 
-  Future<void> _resetCounter() async {
+  void _resetCounter() {
     setState(() {
       _counter = 0;
     });
-    await analytics.logEvent(
+    analytics.logEvent(
         name: '_resetCounter',
         parameters: <String, dynamic>{'_counter': _counter});
-    // Write the variable as a string to the file.
-    await widget.storage.writeCounter(_counter);
-
-    await _updateDB(_counter);
-  }
-
-  Future<void> _updateDB(int counter) async {
-    if (_model == null) {
-      final uuid = await _spDeviceUUID.read();
-      await _counterProvider.getCounterModel(uuid).then((model) {
-        _model = model;
-      });
-    }
-    _model.counter = counter;
-    await _counterProvider.update(_model);
-    // print('id: ${_model.id}, uuid: ${_model.uuid}, counter: ${_model.counter}');
-    setState(() {});
+    CounterStore().set(_counter);
   }
 
   @override
@@ -188,7 +162,7 @@ class _DemoPageState extends State<DemoPage> {
       return 'No one has signed in.';
     }
 
-    final File file = await widget.storage.file;
+    final File file = await CounterStore().getFileStorage();
 
     final StorageReference storageReference = _firebaseStorage
         .ref()
