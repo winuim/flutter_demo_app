@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'counter_store.dart';
+import 'package:flutter_demo_app/utils/counter_store.dart';
 
 class CounterFileStorage implements ICounterStoreStrategy {
   Future<File> get file => _localFile;

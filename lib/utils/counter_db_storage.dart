@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import '../models/counter_model.dart';
-import 'counter_store.dart';
-import 'sharedpref_device_uuid.dart';
+import 'package:flutter_demo_app/models/counter_model.dart';
+import 'package:flutter_demo_app/utils/counter_store.dart';
+import 'package:flutter_demo_app/utils/sharedpref_device_uuid.dart';
 
 class CounterDbStorage implements ICounterStoreStrategy {
   CounterDbStorage() {

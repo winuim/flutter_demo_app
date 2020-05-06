@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'counter_db_storage.dart';
-import 'counter_file_storage.dart';
+import 'package:flutter_demo_app/utils/counter_db_storage.dart';
+import 'package:flutter_demo_app/utils/counter_file_storage.dart';
 
 abstract class ICounterStoreStrategy {
   Future<int> readCounter();

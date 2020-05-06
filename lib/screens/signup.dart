@@ -4,10 +4,10 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:provider/provider.dart';
 
-import '../components/signup/email_textfield.dart';
-import '../components/signup/password_textfield.dart';
-import '../components/signup/username_textfield.dart';
-import '../models/auth_user_model.dart';
+import 'package:flutter_demo_app/components/signup/email_textfield.dart';
+import 'package:flutter_demo_app/components/signup/password_textfield.dart';
+import 'package:flutter_demo_app/components/signup/username_textfield.dart';
+import 'package:flutter_demo_app/models/auth_user_model.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key key, this.title, this.analytics, this.observer})

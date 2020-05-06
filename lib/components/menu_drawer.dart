@@ -3,7 +3,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:provider/provider.dart';
 
-import '../models/auth_user_model.dart';
+import 'package:flutter_demo_app/models/auth_user_model.dart';
 
 class MenuDrawer extends StatelessWidget {
   const MenuDrawer({Key key, this.analytics, this.observer})

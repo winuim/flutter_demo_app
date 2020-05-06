@@ -4,7 +4,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../components/signup/email_textfield.dart';
+import 'package:flutter_demo_app/components/signup/email_textfield.dart';
 
 class PasswordResetPage extends StatefulWidget {
   const PasswordResetPage({Key key, this.title, this.analytics, this.observer})
