@@ -14,7 +14,7 @@ import 'package:flutter_demo_app/utils/counter_store.dart';
 final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
 class DemoPage extends StatefulWidget {
-  const DemoPage({Key key, this.title, this.analytics, this.observer})
+  const DemoPage({Key key, this.title, this.analytics, this.observer, this.counterStore})
       : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
@@ -29,6 +29,7 @@ class DemoPage extends StatefulWidget {
   final String title;
   final FirebaseAnalytics analytics;
   final FirebaseAnalyticsObserver observer;
+  final CounterStore counterStore;
 
   @override
   _DemoPageState createState() => _DemoPageState();
@@ -41,7 +42,7 @@ class _DemoPageState extends State<DemoPage> {
   void initState() {
     super.initState();
     _counter = 0;
-    CounterStore().get().then((value) {
+    widget.counterStore.get().then((value) {
       setState(() {
         _counter = value;
       });
@@ -60,7 +61,7 @@ class _DemoPageState extends State<DemoPage> {
     widget.analytics.logEvent(
         name: '_incrementCounter',
         parameters: <String, dynamic>{'_counter': _counter});
-    CounterStore().set(_counter);
+    widget.counterStore.set(_counter);
   }
 
   void _resetCounter() {
@@ -70,7 +71,7 @@ class _DemoPageState extends State<DemoPage> {
     widget.analytics.logEvent(
         name: '_resetCounter',
         parameters: <String, dynamic>{'_counter': _counter});
-    CounterStore().set(_counter);
+    widget.counterStore.set(_counter);
   }
 
   @override

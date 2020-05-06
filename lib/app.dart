@@ -4,13 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'models/auth_user_model.dart';
-import 'screens/cupertino_demo.dart';
-import 'screens/demo.dart';
-import 'screens/password_reset.dart';
-import 'screens/provider_demo.dart';
-import 'screens/signin.dart';
-import 'screens/signup.dart';
+import 'package:flutter_demo_app/models/auth_user_model.dart';
+import 'package:flutter_demo_app/screens/cupertino_demo.dart';
+import 'package:flutter_demo_app/screens/demo.dart';
+import 'package:flutter_demo_app/screens/password_reset.dart';
+import 'package:flutter_demo_app/screens/provider_demo.dart';
+import 'package:flutter_demo_app/screens/signin.dart';
+import 'package:flutter_demo_app/screens/signup.dart';
+import 'package:flutter_demo_app/utils/counter_store.dart';
 
 class MyApp extends StatelessWidget {
   static final FirebaseAnalytics _analytics = FirebaseAnalytics();
@@ -64,7 +65,8 @@ class MyApp extends StatelessWidget {
       '/demo': (BuildContext context) => DemoPage(
           title: 'Flutter Demo Home Page',
           analytics: _analytics,
-          observer: _observer),
+          observer: _observer,
+          counterStore: CounterStore()),
       '/cupertino': (BuildContext context) => CupertinoDemoPage(
           title: 'Flutter Cupertino Demo Page',
           analytics: _analytics,

@@ -12,27 +12,36 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:flutter_demo_app/screens/demo.dart';
+import 'package:flutter_demo_app/utils/counter_store.dart';
 
 class MockAnalytics extends Mock implements FirebaseAnalytics {}
 
 class MockAnalyticsObserver extends Mock implements FirebaseAnalyticsObserver {}
 
+class MockCounterStore extends Mock implements CounterStore {}
+
 void main() {
   FirebaseAnalytics _analytics;
   FirebaseAnalyticsObserver _observer;
+  CounterStore _counterStore;
 
   setUpAll(() async {
     _analytics = MockAnalytics();
     _observer = MockAnalyticsObserver();
+    _counterStore = MockCounterStore();
   });
 
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Return 0 CounterStore().get()
+    when(_counterStore.get()).thenAnswer((_) => Future.value(0));
+
     // Build our app and trigger a frame.
     await tester.pumpWidget(MaterialApp(
         home: DemoPage(
       title: 'Flutter Demo Test Page',
       analytics: _analytics,
       observer: _observer,
+      counterStore: _counterStore,
     )));
 
     // Verify that our counter starts at 0.
@@ -49,12 +58,16 @@ void main() {
   });
 
   testWidgets('Counter reset smoke test', (WidgetTester tester) async {
+    // Return 0 CounterStore().get()
+    when(_counterStore.get()).thenAnswer((_) => Future.value(0));
+
     // Build our app and trigger a frame.
     await tester.pumpWidget(MaterialApp(
         home: DemoPage(
       title: 'Flutter Demo Home Page',
       analytics: _analytics,
       observer: _observer,
+      counterStore: _counterStore,
     )));
 
     await tester.tap(find.byKey(const Key('reset')));
