@@ -167,7 +167,7 @@ class _DemoPageState extends State<DemoPage> {
       return 'No one has signed in.';
     }
 
-    final File file = await CounterStore().getFileStorage();
+    final File file = await CounterStore().getFile();
 
     final StorageReference storageReference = _firebaseStorage
         .ref()

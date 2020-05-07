@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter_demo_app/utils/counter_db_storage.dart';
-import 'package:flutter_demo_app/utils/counter_file_storage.dart';
+import 'package:flutter_demo_app/utils/counter_db_store.dart';
+import 'package:flutter_demo_app/utils/counter_file_store.dart';
+import 'package:flutter_demo_app/utils/counter_json_store.dart';
 
 abstract class ICounterStoreStrategy {
   Future<int> readCounter();
   Future<void> writeCounter(int counter);
+  Future<File> get file;
 }
 
 class CounterStore {
   final List<ICounterStoreStrategy> _counterStoreStrategy = [
-    CounterFileStorage(), CounterDbStorage()
+    CounterFileStore(), CounterDbStore(), CounterJsonStore()
   ];
   int _selectedStrategyIndex = 0;
 
@@ -31,5 +33,5 @@ class CounterStore {
   Future<void> set(int value) => _counterStoreStrategy[_selectedStrategyIndex].writeCounter(value);
   Future<int> get() => _counterStoreStrategy[_selectedStrategyIndex].readCounter();
   Future<void> reset() => _counterStoreStrategy[_selectedStrategyIndex].writeCounter(0);
-  Future<File> getFileStorage() => CounterFileStorage().file;
+  Future<File> getFile() => _counterStoreStrategy[_selectedStrategyIndex].file;
 }
