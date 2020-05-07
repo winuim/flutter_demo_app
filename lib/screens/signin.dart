@@ -17,14 +17,10 @@ class SignInPage extends StatefulWidget {
   final FirebaseAnalyticsObserver observer;
 
   @override
-  _SignInPageState createState() => _SignInPageState(analytics, observer);
+  _SignInPageState createState() => _SignInPageState();
 }
 
 class _SignInPageState extends State<SignInPage> {
-  _SignInPageState(this.analytics, this.observer);
-  final FirebaseAnalyticsObserver observer;
-  final FirebaseAnalytics analytics;
-
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -73,15 +69,16 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     FlatButton(
                       child: const Text('サインイン'),
-                      onPressed: () async {
+                      onPressed: () {
                         if (_formKey.currentState.validate()) {
                           try {
-                            await Provider.of<AuthUserModel>(context,
-                                    listen: false)
+                            Provider.of<AuthUserModel>(context, listen: false)
                                 .signIn(_emailController.text,
-                                    _passwordController.text);
-                            analytics.logLogin();
-                            Navigator.pop(context, 'サインインに成功しました');
+                                    _passwordController.text)
+                                .then((_) {
+                              widget.analytics.logLogin();
+                              Navigator.pop(context, 'サインインに成功しました');
+                            });
                           } on PlatformException catch (e) {
                             print(e);
                             Scaffold.of(context).showSnackBar(const SnackBar(
@@ -123,10 +120,12 @@ class _SignInPageState extends State<SignInPage> {
                 style: TextStyle(color: Theme.of(context).primaryColor)),
             onPressed: () async {
               try {
-                await Provider.of<AuthUserModel>(context, listen: false)
-                    .signInAnonymously();
-                analytics.logLogin(loginMethod: 'signInAnonymously');
-                Navigator.pop(context, '匿名サインインに成功しました');
+                Provider.of<AuthUserModel>(context, listen: false)
+                    .signInAnonymously()
+                    .then((_) {
+                  widget.analytics.logLogin(loginMethod: 'signInAnonymously');
+                  Navigator.pop(context, '匿名サインインに成功しました');
+                });
               } on PlatformException catch (e) {
                 // print(e);
                 Scaffold.of(context).showSnackBar(const SnackBar(

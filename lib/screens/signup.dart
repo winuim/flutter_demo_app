@@ -18,15 +18,10 @@ class SignUpPage extends StatefulWidget {
   final FirebaseAnalyticsObserver observer;
 
   @override
-  _SignUpPageState createState() => _SignUpPageState(analytics, observer);
+  _SignUpPageState createState() => _SignUpPageState();
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  _SignUpPageState(this.analytics, this.observer);
-
-  final FirebaseAnalyticsObserver observer;
-  final FirebaseAnalytics analytics;
-
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -93,18 +88,20 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     FlatButton(
                       child: const Text('アカウント登録'),
-                      onPressed: () async {
+                      onPressed: () {
                         if (_formKey.currentState.validate()) {
                           try {
-                            await Provider.of<AuthUserModel>(context,
-                                    listen: false)
+                            Provider.of<AuthUserModel>(context, listen: false)
                                 .signUp(
                                     _emailController.text,
                                     _passwordController.text,
-                                    _usernameController.text);
-                            analytics.logSignUp(
-                                signUpMethod: 'createUserWithEmailAndPassword');
-                            Navigator.pop(context, 'アカウント登録&サインインに成功しました');
+                                    _usernameController.text)
+                                .then((_) {
+                              widget.analytics.logSignUp(
+                                  signUpMethod:
+                                      'createUserWithEmailAndPassword');
+                              Navigator.pop(context, 'アカウント登録&サインインに成功しました');
+                            });
                           } on PlatformException catch (e) {
                             // print(e);
                             switch (e.code) {

@@ -6,8 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_demo_app/models/auth_user_model.dart';
 
 class MenuDrawer extends StatelessWidget {
-  const MenuDrawer({Key key, this.analytics, this.observer})
-      : super(key: key);
+  const MenuDrawer({Key key, this.analytics, this.observer}) : super(key: key);
 
   final FirebaseAnalytics analytics;
   final FirebaseAnalyticsObserver observer;
@@ -35,12 +34,15 @@ class MenuDrawer extends StatelessWidget {
           ),
           ListTile(
             title: const Text('サインアウト'),
-            onTap: () async {
-              await Provider.of<AuthUserModel>(context, listen: false).signOut();
-              Scaffold.of(context).showSnackBar(const SnackBar(
-                content: Text('サインアウトしました'),
-              ));
-              Navigator.pop(context);
+            onTap: () {
+              Provider.of<AuthUserModel>(context, listen: false)
+                  .signOut()
+                  .then((_) {
+                Scaffold.of(context).showSnackBar(const SnackBar(
+                  content: Text('サインアウトしました'),
+                ));
+                Navigator.pop(context);
+              });
             },
             enabled: Provider.of<AuthUserModel>(context).user != null,
           ),

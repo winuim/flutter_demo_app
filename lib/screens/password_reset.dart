@@ -15,13 +15,10 @@ class PasswordResetPage extends StatefulWidget {
   final FirebaseAnalyticsObserver observer;
 
   @override
-  _PasswordResetPageState createState() => _PasswordResetPageState(analytics, observer);
+  _PasswordResetPageState createState() => _PasswordResetPageState();
 }
 
 class _PasswordResetPageState extends State<PasswordResetPage> {
-  _PasswordResetPageState(this.analytics, this.observer);
-  final FirebaseAnalyticsObserver observer;
-  final FirebaseAnalytics analytics;
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();

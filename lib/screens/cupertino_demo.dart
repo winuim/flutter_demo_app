@@ -21,14 +21,10 @@ class CupertinoDemoPage extends StatefulWidget {
   final FirebaseAnalyticsObserver observer;
 
   @override
-  _CupertinoDemoPageState createState() => _CupertinoDemoPageState(analytics, observer);
+  _CupertinoDemoPageState createState() => _CupertinoDemoPageState();
 }
 
 class _CupertinoDemoPageState extends State<CupertinoDemoPage> {
-  _CupertinoDemoPageState(this.analytics, this.observer);
-
-  final FirebaseAnalyticsObserver observer;
-  final FirebaseAnalytics analytics;
   int _counter = 0;
 
   void _incrementCounter() {
@@ -39,7 +35,7 @@ class _CupertinoDemoPageState extends State<CupertinoDemoPage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-      analytics.logEvent(
+      widget.analytics.logEvent(
           name: 'cupertino_incrementCounter',
           parameters: <String, dynamic>{'_counter': _counter});
     });
