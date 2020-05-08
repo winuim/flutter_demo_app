@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:flutter_demo_app/models/auth_user_model.dart';
 import 'package:flutter_demo_app/screens/barcode_scanner.dart';
+import 'package:flutter_demo_app/screens/camera_preview_scanner.dart';
 import 'package:flutter_demo_app/screens/cupertino_demo.dart';
 import 'package:flutter_demo_app/screens/demo.dart';
 import 'package:flutter_demo_app/screens/password_reset.dart';
@@ -90,6 +91,10 @@ class MyApp extends StatelessWidget {
           observer: _observer),
       '/barcode_scanner': (BuildContext context) => MaterialBarcodeScanner(
           title: 'Flutter Barcode Scanner Page',
+          analytics: _analytics,
+          observer: _observer),
+      '/camera_preview': (BuildContext context) => CameraPreviewScanner(
+          title: 'Flutter Camera Preview Page',
           analytics: _analytics,
           observer: _observer)
     };
