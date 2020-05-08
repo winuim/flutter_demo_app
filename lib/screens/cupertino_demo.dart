@@ -35,9 +35,6 @@ class _CupertinoDemoPageState extends State<CupertinoDemoPage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
-      widget.analytics.logEvent(
-          name: 'cupertino_incrementCounter',
-          parameters: <String, dynamic>{'_counter': _counter});
     });
   }
 

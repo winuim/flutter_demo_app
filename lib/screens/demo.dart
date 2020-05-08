@@ -58,20 +58,12 @@ class _DemoPageState extends State<DemoPage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
-    widget.analytics.logEvent(
-        name: '_incrementCounter',
-        parameters: <String, dynamic>{'_counter': _counter});
-    widget.counterStore.set(_counter);
   }
 
   void _resetCounter() {
     setState(() {
       _counter = 0;
     });
-    widget.analytics.logEvent(
-        name: '_resetCounter',
-        parameters: <String, dynamic>{'_counter': _counter});
-    widget.counterStore.set(_counter);
   }
 
   @override

@@ -33,6 +33,13 @@ class MenuDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            title: const Text('バーコードスキャナー'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/barcode_scanner');
+            },
+          ),
+          ListTile(
             title: const Text('サインアウト'),
             onTap: () {
               Provider.of<AuthUserModel>(context, listen: false)
