@@ -58,12 +58,14 @@ class _DemoPageState extends State<DemoPage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+    widget.counterStore.set(_counter);
   }
 
   void _resetCounter() {
     setState(() {
       _counter = 0;
     });
+    widget.counterStore.set(_counter);
   }
 
   @override
@@ -163,7 +165,7 @@ class _DemoPageState extends State<DemoPage> {
 
     final StorageReference storageReference = _firebaseStorage
         .ref()
-        .child('text')
+        .child('texts')
         .child(user.uid)
         .child('counter.txt');
 
